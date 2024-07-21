@@ -1,0 +1,31 @@
+https://medium.com/coders-camp/180-data-science-and-machine-learning-projects-with-python-6191bc7b9db9
+book : Data science and Analytics with python in Amazon
+
+link:
+https://github.com/ashishpatel26/500-AI-Machine-learning-Deep-learning-Computer-vision-NLP-Projects-with-code?tab=readme-ov-file&mcp_token=eyJwaWQiOjEwMTA2OTUsInNpZCI6NzUzOTYzMzEzLCJheCI6ImNjMDNjNjU1YjFmYjJhOGRmYWJhYzJmOTA3ZWU0MmVlIiwidHMiOjE3MTk5ODg4MjIsImV4cCI6MTcyMjQwODAyMn0.O4_OHj76iQjvJfJ1A4QSdJ7RtU2z4K5ZB4o4DnrhH-Q
+
+submission should contain following files with right formate:
+
+1. Python
+2. csv file used
+3. test file that contains details of the project
+4. PPT
+
+Ex Format:
+
+1. mohan_credit_card_fraud_detection.py
+2. mohan_credit_card.csv
+3. mohan_credit_card_fraud_detection_document
+
+Weightage:
+>> Proper naming convention
+>> Class and Functions
+>> Number of preprocessing done
+>> Number of visualization done
+>> Model used and Reason behind the same
+>> Model metrics(r2 square, accuracy score i.e)
+
+8971944288 - Mohan Data Science
+
+https://github.com/practical-tutorials/project-based-learning
+

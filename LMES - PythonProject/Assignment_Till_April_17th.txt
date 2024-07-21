@@ -1,0 +1,107 @@
+1. Python_Basics
+
+---> Mohan_Python_Basics (File name)
+---> PPT (That best describes the basics of python and installation and virtual environment)
+---> A file that should contains all the functions of python string, list , tuple ,dictionary
+
+2. Function and Classes
+
+---> Python Program that contains all the types of function and also example for return statement
+---> Python program that contains all the class and oops
+
+3. Python Libraries
+
+---> Write a simple program that contains a example for the number of libraries you seen till now.
+
+4. python Pandas and File Reading
+
+---> Write a program that does all the file manipulation
+---> use both CSV and also Pandas library
+---> Try share few more file operation like (text file operation, excel file operation, pdf file operation)
+
+5. Python Data Science Basics
+
+---> EDA, DAta Wrangling, PReprocessing
+
+6. Python Visualization
+
+---> Write a program that best describes various plots and grapsh that can be used for projecting
+
+7. Presentation of Data Science till April 17th.
+
+---> File of PPT that contain a details
+
+8. Start LEvel Program
+
+---> Write a program that takes one real time csv file (download from kaggle), and do all the operation till sampling with that one single csv file.
+
+
+#Ethics of writing code
+
+1. Coding Standard
+
+#In General many companies has the tool called "JIRA" 
+
+---> Developer ---> Technical Manager, Technical LEad, Software dev
+---> Tester   
+---> Dev-ops
+---> Product-Owner
+---> Project Manager 
+
+
+1. First client has decided to give you or your company a work.
+2. Business Analyst from project will go and interact with client 
+
+2.1 Duration of projct
+2.2 List of Tools
+2.3 Cost
+2.4 Members
+
+POC (Proof of Concept)
+
+3. Project Manager and owner will interact and decide the work for next two years
+
+3.1 They plan in the quarters
+3.2 ther are 8 quarters
+3.3 Each quarter will 9 sprint
+3.4 MEans 1 sprint is equal to 10 days
+
+I have my code ready, i will pushing it to the main code (it will trigger a notification to the technical lead)
+Techincal lead will review the code , he will revert the code 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
