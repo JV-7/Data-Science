@@ -1,0 +1,126 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.width', 1000)
+
+df = pd.read_csv(r'C:\Users\jayavaradhan.olivu\OneDrive - DISYS\Documents\Data Science\Data-Science\Data Science\Projects\heart.csv')
+
+df_copy = df.copy()
+
+## Read Data
+
+# print(df.head())
+
+# print(df.info())
+
+# print(df.describe())
+
+## visualization:
+
+y = df_copy['HeartDisease']
+sns.countplot(df_copy,x=y,label='Total')
+Rain, NotRain = y.value_counts()
+# plt.show()
+
+print('Have Heart Disease: ', Rain)
+print('Not Have Heart Disease: ', NotRain)
+
+df.hist(figsize=(12,10))
+plt.suptitle('Histrogram for number of categoricals')
+# plt.show()
+
+
+## Preprocessing
+
+LE = LabelEncoder()
+
+cat_Features = [col for col in df_copy.columns if df_copy[col].dtype == 'object']
+
+for col in df_copy[cat_Features]:
+    df_copy[col] = LE.fit_transform(df_copy[col])
+
+print(df_copy.head())
+print(df.head())
+
+
+## correlation_matrix
+
+corr_matrix = df_copy.corr(method='pearson')
+plt.figure(figsize=(10, 10))
+sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
+
+# print(corr_matrix)
+# plt.show()
+
+''' based on the co-relation we're selecting the features'''
+
+Thresh_hold = 0.2
+selected_features = corr_matrix.index[abs(corr_matrix['HeartDisease']) >= Thresh_hold].to_list()
+selected_features.remove('HeartDisease')
+selected_features = df[selected_features]
+print(selected_features.head())
+
+# print(df[selected_features].head())
+
+## Splitting the data
+
+Target = df['HeartDisease']
+
+x_train, x_test, y_train, y_test = train_test_split(selected_features, Target, test_size=0.2, random_state=42)
+
+cat_Features = [col for col in selected_features.columns if selected_features[col].dtype == 'object']
+num_Features = [col for col in selected_features.columns if selected_features[col].dtype != 'object' ]
+
+print(cat_Features)
+print(num_Features)
+
+num_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='mean')),
+    ('Scaler', StandardScaler())
+])
+
+cat_trasformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('Encoding', OneHotEncoder(handle_unknown='ignore',sparse_output=False))
+])
+
+col_transfer = ColumnTransformer(transformers=[
+    ('numarical', num_transformer, num_Features),
+    ('categorical', cat_trasformer, cat_Features)],
+    remainder='drop'
+)
+
+LOG_Model = LogisticRegression()
+
+LOG__pipeline = make_pipeline(col_transfer, LOG_Model)
+
+LOG__pipeline.fit(x_train, y_train)
+
+print(LOG__pipeline.score(x_train, y_train))
+print(LOG__pipeline.predict(x_test))
+
+# Check the shapes
+print("Shape of selected_features:", selected_features.shape)
+print("Shape of Target:", Target.shape)
+
+# Proceed with train_test_split if everything is correct
+
+print("Shapes after split:")
+print("x_train:", x_train.shape)
+print("x_test:", x_test.shape)
+print("y_train:", y_train.shape)
+print("y_test:", y_test.shape)
+
+
+
