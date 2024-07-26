@@ -2,13 +2,15 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import accuracy_score, confusion_matrix, ConfusionMatrixDisplay, classification_report, roc_curve, roc_auc_score
 from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline, make_pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
+from sklearn.ensemble import RandomForestClassifier
+
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
@@ -29,30 +31,39 @@ df_copy = df.copy()
 ## visualization:
 
 y = df_copy['HeartDisease']
+
+
 sns.countplot(df_copy,x=y,label='Total')
 Rain, NotRain = y.value_counts()
-# plt.show()
+
 
 print('Have Heart Disease: ', Rain)
 print('Not Have Heart Disease: ', NotRain)
 
-df.hist(figsize=(12,10))
-plt.suptitle('Histrogram for number of categoricals')
-# plt.show()
 
+df_copy.hist(figsize=(12,10))
+plt.suptitle('Histrogram for number of categoricals')
 
 ## Preprocessing
 
 LE = LabelEncoder()
-
+Features = df_copy.columns
 cat_Features = [col for col in df_copy.columns if df_copy[col].dtype == 'object']
 
 for col in df_copy[cat_Features]:
     df_copy[col] = LE.fit_transform(df_copy[col])
+    
+
+for col in df_copy.columns:
+    sns.scatterplot(x=df_copy[col], y=df_copy['HeartDisease'],legend=True)
+    plt.title('Scatter plot of {col} vs HeartDisease')
+    plt.xlabel(col)
+    plt.ylabel('HeartDisease')
+    # plt.show()
+    
 
 print(df_copy.head())
 print(df.head())
-
 
 ## correlation_matrix
 
@@ -69,7 +80,10 @@ Thresh_hold = 0.2
 selected_features = corr_matrix.index[abs(corr_matrix['HeartDisease']) >= Thresh_hold].to_list()
 selected_features.remove('HeartDisease')
 selected_features = df[selected_features]
+
 print(selected_features.head())
+
+# print(selected_features.head())
 
 # print(df[selected_features].head())
 
@@ -101,15 +115,16 @@ col_transfer = ColumnTransformer(transformers=[
     remainder='drop'
 )
 
-LOG_Model = LogisticRegression()
+LOG__Model = LogisticRegression()
 
-LOG__pipeline = make_pipeline(col_transfer, LOG_Model)
+LOG__pipeline = make_pipeline(col_transfer, LOG__Model)
 
 LOG__pipeline.fit(x_train, y_train)
 
-print(LOG__pipeline.score(x_train, y_train))
-print(LOG__pipeline.predict(x_test))
 
+LOG__y_pred = LOG__pipeline.predict(x_test)
+LOG_y_prod = LOG__pipeline.predict_proba(x_test)
+LOG_y_prod = LOG_y_prod[:, 1]
 # Check the shapes
 print("Shape of selected_features:", selected_features.shape)
 print("Shape of Target:", Target.shape)
@@ -121,6 +136,138 @@ print("x_train:", x_train.shape)
 print("x_test:", x_test.shape)
 print("y_train:", y_train.shape)
 print("y_test:", y_test.shape)
+
+
+## Metrics:
+
+LOG__train_score = LOG__pipeline.score(x_train, y_train)
+LOG__test_score = LOG__pipeline.score(x_test, y_test)
+LOG__confusion_matrix = confusion_matrix(y_test, LOG__y_pred)
+LOG__classification_report = classification_report(y_test, LOG__y_pred)
+LOG__accuracy_score = accuracy_score(y_test, LOG__y_pred)
+
+print(LOG__confusion_matrix)
+print(LOG__classification_report)
+print(LOG__accuracy_score)
+
+
+roc_auc = roc_auc_score(y_test, LOG_y_prod)
+print("\nROC-AUC Score:", roc_auc)
+
+# ROC Curve
+
+''' 
+fpr (False Positive Rate)
+tpr (True positive Rate)
+'''
+
+fpr, tpr, threshholds = roc_curve(y_test, LOG_y_prod)
+plt.figure(figsize=(8, 6))
+plt.plot(fpr, tpr, color='blue', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
+plt.plot([0, 1], [0, 1], color='gray', linestyle='dotted')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('Receiver Operating Characteristic (ROC) Curve')
+
+
+## Random forest Classifier
+
+### Gini
+
+RFC__Model_gini = RandomForestClassifier(n_estimators=5,criterion='gini',random_state=42)
+
+RFC_pipeline_gini = make_pipeline(col_transfer, RFC__Model_gini)
+RFC_pipeline_gini.fit(x_train, y_train)
+RFC__y_pred_gini = RFC_pipeline_gini.predict(x_test)
+
+## Metric:
+
+RFC__train_score_gini = RFC_pipeline_gini.score(x_train, y_train)
+RFC__test_score_gini = RFC_pipeline_gini.score(x_test, y_test)
+RFC__confusion_matrix_gini = confusion_matrix(y_test, RFC__y_pred_gini)
+RFC_classification_report_gini = classification_report(y_test, RFC__y_pred_gini)
+
+### Entropy
+
+RFC__Model_entropy = RandomForestClassifier(n_estimators=5,criterion='entropy',random_state=42)
+
+RFC_pipeline_entropy = make_pipeline(col_transfer, RFC__Model_entropy)
+RFC_pipeline_entropy.fit(x_train, y_train)
+RFC__y_pred_entropy = RFC_pipeline_entropy.predict(x_test)
+
+## Metric:
+
+RFC__train_score_entropy = RFC_pipeline_entropy.score(x_train, y_train)
+RFC__test_score_entropy = RFC_pipeline_entropy.score(x_test, y_test)
+RFC__confusion_matrix_entropy = confusion_matrix(y_test, LOG__y_pred)
+RFC_classification_report_entropy = classification_report(y_test, RFC__y_pred_entropy)
+
+## Cross-validation
+
+cross_validation_gini = cross_val_score(estimator=RFC_pipeline_gini, X=x_train, y=y_train, cv=10)
+cross_validation_entropy = cross_val_score(estimator=RFC_pipeline_entropy, X=x_train, y=y_train, cv=10)
+
+## comparison of both the scores:
+
+print('RFC')
+print('Train Score', RFC__train_score_entropy)
+print('Test Score', RFC__test_score_entropy)
+
+print('LOG')
+
+print('Train Score', LOG__train_score)
+print('Test Score', LOG__test_score)
+
+if abs(LOG__train_score - LOG__test_score) < 0.05: # 0.05 is threshold
+    print('This model generalize well.')
+elif LOG__train_score > LOG__test_score:
+    print('This model might be overfitting')
+else:
+    print('This Model might be underfitting.')
+    
+if abs(RFC__train_score_entropy - RFC__test_score_entropy) < 0.05: # 0.05 is threshold
+    print('This model generalize well.')
+elif RFC__train_score_entropy > RFC__test_score_entropy:
+    print('This model might be overfitting')
+else:
+    print('This Model might be underfitting.')
+
+
+
+## visual for RFC
+
+# Gini
+
+Features_name_ORE = list(col_transfer.named_transformers_['categorical']['Encoding'].get_feature_names_out(cat_Features))
+Features_name = num_Features + Features_name_ORE
+
+importance_gini = RFC__Model_gini.feature_importances_ 
+Forest_importance_gini = pd.Series(importance_gini, index=Features_name)
+
+plt.figure(figsize=(10, 9))
+Forest_importance_gini.sort_values(ascending=False).plot(kind='bar')
+plt.title('Features Importance')
+ 
+# Entropy
+
+importance_entropy = RFC__Model_entropy.feature_importances_ 
+Forest_importance_entropy = pd.Series(importance_entropy, index=Features_name)
+
+plt.figure(figsize=(10, 9))
+Forest_importance_entropy.sort_values(ascending=False).plot(kind='bar')
+plt.title('Features Importance')
+
+
+## confusion matrix:
+
+plt_confusion_gini = ConfusionMatrixDisplay(confusion_matrix=RFC__confusion_matrix_gini)
+plt_confusion_gini.plot()
+
+plt_confusion_gini = ConfusionMatrixDisplay(confusion_matrix=RFC__confusion_matrix_entropy)
+plt_confusion_gini.plot()
+
+plt.show()
+
 
 
 
