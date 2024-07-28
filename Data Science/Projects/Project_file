@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -16,22 +15,16 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
 pd.set_option('display.width', 1000)
 
+
 df = pd.read_csv(r'C:\Users\jayavaradhan.olivu\OneDrive - DISYS\Documents\Data Science\Data-Science\Data Science\Projects\heart.csv')
 
 df_copy = df.copy()
-
-## Read Data
-
-# print(df.head())
-
-# print(df.info())
-
-# print(df.describe())
 
 ## visualization:
 
 y = df_copy['HeartDisease']
 
+'***********************************************************************'
 
 sns.countplot(df_copy,x=y,label='Total')
 Rain, NotRain = y.value_counts()
@@ -44,6 +37,8 @@ print('Not Have Heart Disease: ', NotRain)
 df_copy.hist(figsize=(12,10))
 plt.suptitle('Histrogram for number of categoricals')
 
+'***********************************************************************'
+
 ## Preprocessing
 
 LE = LabelEncoder()
@@ -54,6 +49,7 @@ for col in df_copy[cat_Features]:
     df_copy[col] = LE.fit_transform(df_copy[col])
     
 
+'***********************************************************************'
 for col in df_copy.columns:
     sns.scatterplot(x=df_copy[col], y=df_copy['HeartDisease'],legend=True)
     plt.title('Scatter plot of {col} vs HeartDisease')
@@ -61,15 +57,19 @@ for col in df_copy.columns:
     plt.ylabel('HeartDisease')
     # plt.show()
     
-
+'***********************************************************************'
 print(df_copy.head())
 print(df.head())
 
 ## correlation_matrix
 
+'***********************************************************************'
+
 corr_matrix = df_copy.corr(method='pearson')
 plt.figure(figsize=(10, 10))
 sns.heatmap(corr_matrix, annot=True, cmap='coolwarm')
+
+'***********************************************************************'
 
 # print(corr_matrix)
 # plt.show()
@@ -80,6 +80,7 @@ Thresh_hold = 0.2
 selected_features = corr_matrix.index[abs(corr_matrix['HeartDisease']) >= Thresh_hold].to_list()
 selected_features.remove('HeartDisease')
 selected_features = df[selected_features]
+
 
 print(selected_features.head())
 
@@ -94,7 +95,7 @@ Target = df['HeartDisease']
 x_train, x_test, y_train, y_test = train_test_split(selected_features, Target, test_size=0.2, random_state=42)
 
 cat_Features = [col for col in selected_features.columns if selected_features[col].dtype == 'object']
-num_Features = [col for col in selected_features.columns if selected_features[col].dtype != 'object' ]
+num_Features = [col for col in selected_features.columns if selected_features[col].dtype != 'object']
 
 print(cat_Features)
 print(num_Features)

@@ -1,0 +1,66 @@
+import dash
+from dash import dcc, html
+from dash.dependencies import Input, Output
+import plotly.graph_objects as go
+import pandas as pd
+import numpy as np
+
+# Initialize the Dash app
+app = dash.Dash(__name__)
+
+# Generate data
+np.random.seed(42)
+good_data = np.random.normal(loc=50, scale=5, size=100)
+good_df = pd.DataFrame(good_data, columns=['Good_data_performance'])
+
+bad_data = np.random.normal(loc=50, scale=20, size=100)
+bad_data = np.append(bad_data, [150, 160, 170, 180, 190])
+bad_df = pd.DataFrame(bad_data, columns=['Bad_Data_Performance'])
+
+# Create figures using Plotly
+fig_good = go.Figure()
+fig_good.add_trace(go.Box(y=good_df['Good_data_performance'], name='Good_data_performance'))
+
+fig_bad = go.Figure()
+fig_bad.add_trace(go.Box(y=bad_df['Bad_Data_Performance'], name='Bad_Data_Performance'))
+
+# Calculate summary statistics
+good_stats = good_df['Good_data_performance'].describe().to_frame().reset_index()
+bad_stats = bad_df['Bad_Data_Performance'].describe().to_frame().reset_index()
+
+# Define the layout of the app
+app.layout = html.Div([
+    html.H1("Box Plot Comparison with Summary Statistics"),
+    html.Div([
+        html.H2("Good Data Performance"),
+        dcc.Graph(
+            id='boxplot-good',
+            figure=fig_good.update_layout(
+                title='Testing cross validation - Good',
+                xaxis_title='Good Data Performance'
+            )
+        ),
+        html.Table([
+            html.Tr([html.Th(col) for col in good_stats.columns]),
+            *[html.Tr([html.Td(good_stats.iloc[i][col]) for col in good_stats.columns]) for i in range(len(good_stats))]
+        ], style={'margin-top': '20px'})
+    ], style={'margin-bottom': '50px'}),
+    html.Div([
+        html.H2("Bad Data Performance"),
+        dcc.Graph(
+            id='boxplot-bad',
+            figure=fig_bad.update_layout(
+                title='Testing cross validation - Bad',
+                xaxis_title='Bad Data Performance'
+            )
+        ),
+        html.Table([
+            html.Tr([html.Th(col) for col in bad_stats.columns]),
+            *[html.Tr([html.Td(bad_stats.iloc[i][col]) for col in bad_stats.columns]) for i in range(len(bad_stats))]
+        ], style={'margin-top': '20px'})
+    ])
+])
+
+# Run the app
+if __name__ == '__main__':
+    app.run_server(debug=True)

@@ -1,0 +1,30 @@
+import dash
+from dash import dcc, html
+import plotly.express as px
+import pandas as pd
+
+# Sample data
+data = {
+    'x': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    'y': [10, 15, 13, 17, 14, 19, 18, 20, 21, 22]
+}
+df = pd.DataFrame(data)
+
+# Create scatter plot
+fig1 = px.scatter(df, x='x', y='y', title='Scatter Plot')
+
+# Create density heatmap
+fig2 = px.density_heatmap(df, x='x', y='y', title='Density Heatmap')
+
+# Initialize the Dash app
+app_1 = dash.Dash(__name__)
+
+# Define the layout of the app
+app_1.layout = html.Div([
+    html.H1("Dash App with Scatter Plot and Density Heatmap"),
+    dcc.Graph(figure=fig1),
+    dcc.Graph(figure=fig2)
+])
+
+if __name__ == '__main__':
+    app_1.run_server(debug=True)
